@@ -1,10 +1,20 @@
-all: kernel
+CC = gcc -Iinclude
+CFLAGS = -m32
+all: kernel-exe
 
-kernel: kasm.o kc.o
-	ld -m elf_i386 -T link.ld -o kernel kasm.o kc.o
+kernel-exe: kasm.o main.o kernel/kernel.o
+	ld -m elf_i386 -T link.ld -o kernel-exe kasm.o main.o kernel/kernel.o
 
-kc.o: kernel.c
-	gcc -m32 -c kernel.c -o kc.o
+main.o: init/main.c
+	$(CC) -m32 -c init/main.c -o main.o
+	
+kernel/kernel.o:
+	(cd kernel; make)	
 
 kasm.o: kernel.asm
 	nasm -f elf32 kernel.asm -o kasm.o
+
+clean:
+	rm *.o
+	rm kernel/*.o
+	rm kernel-exe
