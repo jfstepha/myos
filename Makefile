@@ -18,3 +18,13 @@ clean:
 	rm *.o
 	rm kernel/*.o
 	rm kernel-exe
+	(cd image; make clean)
+
+dep:
+	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make
+	(for i in init/*.c;do echo -n "init/";$(CPP) -M $$i;done) >> tmp_make
+	cp tmp_make Makefile
+### Dependencies:	
+init/main.o: init/main.c /usr/include/stdc-predef.h include/time.h \
+ include/keyboard_map.h include/stdarg.h include/asm/io.h \
+ include/linux/tty.h

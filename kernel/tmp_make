@@ -1,0 +1,22 @@
+CC = gcc -Iinclude
+LD	=ld
+CFLAGS = -m32
+
+.c.o:
+	$(CC) $(CFLAGS) \
+	-c -o $*.o $<
+
+OBJS=tty_io.o console.o
+
+kernel.o: $(OBJS)
+	$(LD) -m elf_i386 -r -o kernel.o $(OBJS)
+	sync
+
+dep:
+	sed '/\#\#\# Dependencies/q' < Makefile > tmp_make
+	(for i in *.c;do echo -n "init/";$(CPP) -M $$i;done) >> tmp_make
+	cp tmp_make Makefile
+
+### Dependencies:
+init/console.o: console.c /usr/include/stdc-predef.h
+init/tty_io.o: tty_io.c /usr/include/stdc-predef.h /usr/include/linux/tty.h
